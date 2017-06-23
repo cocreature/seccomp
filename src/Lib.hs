@@ -73,10 +73,14 @@ pohligHellman g h p factors =
 
 pohligHellman' :: Integer -> Integer -> Integer -> Integer -> Int -> Integer
 pohligHellman' g h p pi ei =
-  sum' (zipWith (\l i -> l * pi ^ i) ls [0 ..]) `mod` (pi ^ ei)
+  sum' (zipWith (\l i -> l * powModInteger pi i (pi ^ ei)) ls [0 ..]) `mod`
+  (pi ^ ei)
   where
     m :: Integer
-    m = if p > 10^12 then 10*10^6 else ceiling (sqrt (fromIntegral p))
+    m =
+      if p > 10 ^ 12
+        then 10 * 10 ^ 6
+        else ceiling (sqrt (fromIntegral p))
     table = buildLookupTable g0 p (fromIntegral m)
     gsize = p - 1
     exponent = gsize `div` pi
@@ -89,8 +93,11 @@ pohligHellman' g h p pi ei =
         k = length ls
         !hk = hk0 * hk1 `mod` p
           where
-            !hk0 = h ^ e `mod` p
+            !hk0 = powModInteger h e p
             !hk1 =
-              ((g ^ e) ^ (sum' (zipWith (\l i -> l * pi ^ i) ls [0 ..])) `mod` p) `inverseMod`
+              (powModInteger
+                 (powModInteger g e p)
+                 (sum' (zipWith (\l i -> l * pi ^ i) ls [0 ..]))
+                 p) `inverseMod`
               p
             !e = gsize `div` (pi ^ (k + 1))
