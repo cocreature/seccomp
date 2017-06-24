@@ -14,7 +14,6 @@ import           Data.Vector ((!), Vector)
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Tim as VA
 import qualified Data.Vector.Mutable as VM
-import           Debug.Trace
 import           GHC.Integer.GMP.Internals
 import           GHC.Stack
 
@@ -33,7 +32,6 @@ binarySearch proj x v = go 0 (V.length v)
 
 buildLookupTable :: Integer -> Integer -> Int -> ST s (HashTable s Integer Int)
 buildLookupTable g p m = do
-  traceM ("Building lookup table of size: " ++ show m)
   table <- HT.newSized m
   mapM_
     (\i -> HT.insert table (powModInteger g (fromIntegral i) p) i)
@@ -73,7 +71,7 @@ pohligHellman g h p factors =
       map
         (\(pi, ei) ->
            let res = pohligHellman' g h p pi ei
-           in traceShow (pi, ei, res) res)
+           in res)
         factors
 
 pohligHellman' :: Integer -> Integer -> Integer -> Integer -> Int -> Integer
